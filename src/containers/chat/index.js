@@ -1,9 +1,16 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
+import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { Launcher } from 'react-chat-window';
 
 import messageHistory from './messageHistory';
+
+const ChatWrapper = styled.div`
+  & .sc-launcher, .sc-header, .sc-message--content.sent .sc-message--text {
+    background-color: #3f50b5;
+  }
+`;
 
 class Chat extends Component {
   constructor(props) {
@@ -39,11 +46,11 @@ class Chat extends Component {
 
   render() {
     return (
-      <div className="App">
+      <ChatWrapper>
         <Launcher
           agentProfile={{
             teamName: 'thunderdome',
-            imageUrl: 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
+            imageUrl: this.props.player.profilePicture || 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
           }}
           onMessageWasSent={this.handleNewUserMessage}
           messageList={this.state.messageList}
@@ -52,13 +59,14 @@ class Chat extends Component {
           isOpen={this.state.isOpen}
           showEmoji
         />
-      </div>
+      </ChatWrapper>
     );
   }
 }
 
 const mapStateToProps = state => ({
   chatLog: state.chatLog,
+  player: state.game.player
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({}, dispatch);

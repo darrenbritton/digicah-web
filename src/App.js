@@ -37,7 +37,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        {this.state.loggedIn ? <NavBar /> : null}
+        {this.state.loggedIn ? <div><NavBar /><Chat /></div> : null}
         {/* <header> */}
         {/* <Link to="/">Home</Link> */}
         {/* <Link to="/chat">Chat</Link> */}
@@ -48,7 +48,6 @@ class App extends Component {
 
         <main>
           <Route exact path="/play" component={Home} />
-          <Route exact path="/chat" component={Chat} />
           <Route exact path="/about-us" component={About} />
           <Route exact path="/logged-out" component={LoggedOut} />
           <Route path="/login" component={() => { window.location = '//localhost:8080/auth/google'; }} />
