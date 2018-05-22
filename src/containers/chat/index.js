@@ -3,8 +3,7 @@ import { bindActionCreators } from 'redux';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { Launcher } from 'react-chat-window';
-
-import messageHistory from './messageHistory';
+import { chat } from '../../actions';
 
 const ChatWrapper = styled.div`
   & .sc-launcher, .sc-header, .sc-message--content.sent .sc-message--text {
@@ -16,17 +15,10 @@ class Chat extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      messageList: messageHistory,
       newMessagesCount: 0,
       isOpen: false,
     };
   }
-
-  onMessageWasSent = (message) => {
-    this.setState({
-      messageList: [...this.state.messageList, message],
-    });
-  };
 
   handleClick = () => {
     this.setState({
@@ -37,11 +29,8 @@ class Chat extends Component {
 
   handleNewUserMessage = (message) => {
     if (Object.keys(message.data).length > 0) {
-      this.setState({
-        messageList: [...this.state.messageList, message],
-      });
+      this.props.sendMessage({text: message.data.text})
     }
-    // Now send the message throught the backend API
   };
 
   render() {
@@ -50,10 +39,10 @@ class Chat extends Component {
         <Launcher
           agentProfile={{
             teamName: 'thunderdome',
-            imageUrl: this.props.player.profilePicture || 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
+            imageUrl: 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
           }}
           onMessageWasSent={this.handleNewUserMessage}
-          messageList={this.state.messageList}
+          messageList={this.props.chatlog.map(message => message.sender === this.props.player.id ? {...message, data: {text: message.data.raw}, author: 'me'} : message)}
           newMessagesCount={this.state.newMessagesCount}
           handleClick={this.handleClick}
           isOpen={this.state.isOpen}
@@ -65,11 +54,13 @@ class Chat extends Component {
 }
 
 const mapStateToProps = state => ({
-  chatLog: state.chatLog,
+  chatlog: state.chat.chatlog,
   player: state.game.player
 });
 
-const mapDispatchToProps = dispatch => bindActionCreators({}, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({
+  sendMessage: chat.send
+}, dispatch);
 
 export default connect(
   mapStateToProps,

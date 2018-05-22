@@ -8,6 +8,8 @@ import actions from '../actions';
 
 export const history = createHistory();
 
+export let primus = {};
+
 const initialState = {};
 const enhancers = [];
 const middleware = [
@@ -35,7 +37,7 @@ const store = createStore(
 );
 
 if (window.Primus) {
-  const primus = new window.Primus('//localhost:8080');
+  primus = new window.Primus('//localhost:8080');
   primus.on('data', function primusData(data) {
     if (data.action) {
       const actionGroup = data.action.split('.');
