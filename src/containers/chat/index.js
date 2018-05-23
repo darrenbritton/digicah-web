@@ -9,6 +9,9 @@ const ChatWrapper = styled.div`
   & .sc-launcher, .sc-header, .sc-message--content.sent .sc-message--text {
     background-color: #3f50b5;
   }
+  & .sc-chat-window.opened {
+    z-index: 1;
+  }
 `;
 
 class Chat extends Component {
