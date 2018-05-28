@@ -13,15 +13,11 @@ class Home extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  game: state.game,
-});
-
 const mapDispatchToProps = dispatch => bindActionCreators({
   changePage: () => push('/about-us'),
 }, dispatch);
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps,
 )(Home);

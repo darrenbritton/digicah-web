@@ -11,6 +11,7 @@ const ChatWrapper = styled.div`
   }
   & .sc-chat-window.opened {
     z-index: 1;
+    height: 35vh;
   }
 `;
 
@@ -58,7 +59,7 @@ class Chat extends Component {
 
 const mapStateToProps = state => ({
   chatlog: state.chat.chatlog,
-  player: state.game.player
+  player: state.player
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

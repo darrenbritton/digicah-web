@@ -6,10 +6,12 @@ import { connect } from 'react-redux';
 
 import Home from './containers/home';
 import Chat from './containers/chat';
+import Game from './containers/game';
 import LoggedOut from './containers/loggedOut';
 import About from './containers/about';
 
 import NavBar from './components/navBar';
+import SnackBar from './components/snackBar';
 
 
 class App extends Component {
@@ -21,9 +23,14 @@ class App extends Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    if ((Object.keys(nextProps.game.player).length > 0) !== prevState.loggedIn) {
-      if (!prevState.loggedIn) nextProps.loggedIn();
-      return { loggedIn: !prevState.loggedIn };
+    if ((Object.keys(nextProps.player.session).length > 0) !== prevState.loggedIn) {
+      if (!prevState.loggedIn && !nextProps.location.pathname.includes('game')) {
+        nextProps.loggedIn();
+        return { loggedIn: !prevState.loggedIn };
+      }
+      nextProps.loggedOut();
+    } else if (Object.keys(nextProps.player.session).length > 0) {
+      return { loggedIn: true };
     }
     return prevState;
   }
@@ -48,11 +55,13 @@ class App extends Component {
 
         <main>
           <Route exact path="/play" component={Home} />
+          <Route exact path="/play/game/:id" component={Game} />
           <Route exact path="/about-us" component={About} />
           <Route exact path="/logged-out" component={LoggedOut} />
           <Route path="/login" component={() => { window.location = '//localhost:8080/auth/google'; }} />
           <Route path="/logout" component={() => { window.location = '//localhost:8080/logout'; }} />
         </main>
+        <SnackBar/>
       </div>
     );
   }
@@ -60,6 +69,7 @@ class App extends Component {
 
 const mapStateToProps = state => ({
   game: state.game,
+  player: state.player,
   location: state.routing.location,
 });
 

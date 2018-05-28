@@ -9,7 +9,6 @@ const getTime = function(timestamp) {
 export default function (state = { chatlog: [] }, action) {
   switch (action.type) {
     case CHAT_MESSAGE:
-      console.log(action);
       return {
         ...state,
         chatlog: [...state.chatlog, {

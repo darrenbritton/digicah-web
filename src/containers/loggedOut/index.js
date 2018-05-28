@@ -4,6 +4,11 @@ import { Flex, Box } from 'grid-styled';
 
 import Button from '@material-ui/core/Button';
 
+const Wrapper = styled.div`
+  height: 100vh;
+  background: url("/background.png");
+`;
+
 const ButtonIcon = styled.img`
   position: relative;
   margin-left: 11px;
@@ -21,22 +26,24 @@ const HeroText = styled.a`
     font-size: 4em;
     -webkit-text-fill-color: transparent;
     -webkit-background-clip: text;
-    background-image: url(https://media.giphy.com/media/l1J9R1Q7LJGSZOxFe/giphy.gif);
+    background-image: url(/animation.gif);
 `;
 
 class LoggedOut extends Component {
   render() {
     return (
-      <Flex flexDirection="column">
-        <TiltedBox m="auto" mt="35vh">
-          <HeroText>Digicah</HeroText>
-        </TiltedBox>
-        <Box m="auto" mt="4vh">
-          <Button href="/login" variant="raised" color="primary">
-                        Login With <ButtonIcon src="//upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" />
-          </Button>
-        </Box>
-      </Flex>
+      <Wrapper>
+        <Flex flexDirection="column">
+          <TiltedBox m="auto" mt="35vh">
+            <HeroText>Digicah</HeroText>
+          </TiltedBox>
+          <Box m="auto" mt="4vh">
+            <Button href="/login" variant="raised" color="primary">
+              Login With <ButtonIcon src="/googleLogo.svg" />
+            </Button>
+          </Box>
+        </Flex>
+      </Wrapper>
     );
   }
 }

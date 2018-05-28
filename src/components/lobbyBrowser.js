@@ -5,7 +5,7 @@ import { Flex, Box } from 'grid-styled';
 import styled from 'styled-components';
 import SwipeableViews from 'react-swipeable-views';
 
-import { game } from '../actions';
+import { game, player } from '../actions';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -24,9 +24,10 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import Chip from '@material-ui/core/Chip';
 import Button from '@material-ui/core/Button';
-import {chat} from "../actions";
+import {push} from "react-router-redux";
 
 const FormTab = styled(Box)`
+  
   & > div > div, button {
     width: 100%;
     margin: auto;
@@ -34,6 +35,7 @@ const FormTab = styled(Box)`
   button {
     margin-bottom: 3vh;
   }
+  
 `;
 
 const ITEM_HEIGHT = 48;
@@ -88,10 +90,13 @@ class LobbyBrowser extends Component {
     this.setState({tabValue: 0});
   }
 
+  join = (id) => {
 
+    this.props.joinGame({id});
+    this.props.navigateToGame(id);
+  }
 
   render() {
-    const { classes } = this.props;
     return (
       <Flex flexDirection='column'>
         <Box m="auto" mt="15vh" style={{maxWidth: '100vw'}}>
@@ -127,12 +132,12 @@ class LobbyBrowser extends Component {
                               {n.name}
                             </TableCell>
                             <TableCell>{n.creator}</TableCell>
-                            <TableCell>{n.cardpacks}</TableCell>
+                            <TableCell>{n.cardpacks.join(', ')}</TableCell>
                             <TableCell>{n.hasPassword ? '✔️' : '❌'}</TableCell>
                             <TableCell>{`${n.maxPlayers}/${n.players.length}`}</TableCell>
                             <TableCell>{n.waitForPlayers ? '✔️' : '❌'}</TableCell>
                             <TableCell>
-                              <Button variant="raised" color="primary">
+                              <Button variant="raised" color="primary" onClick={() => this.join(n.id)}>
                                 Join
                               </Button>
                             </TableCell>
@@ -230,7 +235,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-  createGame: game.create
+  createGame: game.create,
+  joinGame: player.joinGame,
+  navigateToGame: (id) => push(`play/game/${id}`)
 }, dispatch);
 
 export default connect(
