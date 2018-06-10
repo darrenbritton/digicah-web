@@ -3,6 +3,7 @@ import { primus } from '../store';
 export const SAVE_PLAYER = 'save-player';
 export const SAVE_LOBBIES = 'save-lobbies';
 export const SAVE_CARDPACKS = 'save-cardpacks';
+export const SAVE_HAND = 'save-hand';
 export const CHAT_MESSAGE = 'chat-message';
 export const CHAT_SEND = 'chat-send';
 export const GAME_CREATE = 'game-create';
@@ -14,6 +15,10 @@ export const TOGGLE_PLAYER_DRAWER = 'toggle-player-drawer';
 export const TAKE_BREAK = 'take-break';
 export const RETURN_FROM_BREAK = 'return-from-break';
 export const NEW_ROUND = 'new-round';
+export const PLAYER_SUBMIT = 'player-submit';
+export const PLAYER_JUDGE = 'player-judge';
+export const CZAR_JUDGE = 'czar-judge';
+export const GAME_JUDGING = 'game-judging';
 
 export const save = {
   player: payload => (dispatch) => {
@@ -31,6 +36,12 @@ export const save = {
   cardpacks: payload => (dispatch) => {
     dispatch({
       type: SAVE_CARDPACKS,
+      payload,
+    });
+  },
+  hand: payload => (dispatch) => {
+    dispatch({
+      type: SAVE_HAND,
       payload,
     });
   },
@@ -78,6 +89,12 @@ export const game = {
       payload,
     });
   },
+  judging: payload => (dispatch) => {
+    dispatch({
+      type: GAME_JUDGING,
+      payload,
+    })
+  },
 };
 
 export const notify = {
@@ -106,6 +123,26 @@ export const player = {
       payload: {...payload, inGame: true},
     });
   },
+  submit: payload => (dispatch) => {
+    primus.write({
+      type: 'player.submit',
+      payload,
+    });
+    dispatch({
+      type: PLAYER_SUBMIT,
+      payload: payload,
+    });
+  },
+  judge: payload => (dispatch) => {
+    primus.write({
+      type: 'czar.judge',
+      payload,
+    });
+    dispatch({
+      type: PLAYER_JUDGE,
+      payload,
+    });
+  },
   leaveGame: () => (dispatch) => {
     dispatch({
       type: JOIN_GAME,
@@ -126,6 +163,15 @@ export const player = {
   },
 };
 
+export const czar = {
+  judge: payload => (dispatch) => {
+    dispatch({
+      type: CZAR_JUDGE,
+      payload
+    });
+  }
+}
+
 export const display = {
   togglePlayerDrawer: () => (dispatch) => {
     dispatch({
@@ -140,5 +186,6 @@ export default {
   chat,
   notify,
   player,
+  czar,
   game
 };

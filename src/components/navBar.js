@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
-import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { Flex, Box } from 'grid-styled';
-import {display, player} from "../actions";
-import {push} from "react-router-redux";
+import {display, player} from '../actions';
+import {push} from 'react-router-redux';
+
+import ReactCountdownClock from 'react-countdown-clock';
 
 const HeroText = styled.a`
     font-family: 'Pacifico';
@@ -17,21 +18,30 @@ const HeroText = styled.a`
     text-decoration: none;
 `;
 
-const styles = {
-  menuButton: {
-    marginLeft: -12,
-    marginRight: 20,
-  },
-};
-
+const ActionWrapper = styled(Box)`
+  .react-countdown-clock {
+    position: fixed;
+    right: 25px;
+    top: 90px;
+  }
+`;
 
 class NavBar extends Component {
   render() {
     const buttons = [];
+    let timer = null;
     if (this.props.player.inGame) {
       buttons.push(<Button key='take-a-break' onClick={() => this.props.takeBreak()} color="inherit">Take A Break</Button>);
       buttons.push(<Button key='leave' href="/play" color="inherit">Leave</Button>);
       buttons.push(<Button key='view-players' onClick={() => this.props.togglePlayerDrawer()} color="inherit">View Players</Button>);
+      if( this.props.playing.currentRound.players && !this.props.playing.judging && this.props.playing && this.props.playing.timeout > 0) {
+        timer = (<ReactCountdownClock
+          seconds={this.props.playing.timeout / 1000}
+          color="#fff"
+          alpha={0.9}
+          size={60}
+        />);
+      }
     }
     buttons.push(<Button key='logout' href="/logout" color="inherit">Logout</Button>);
     return (
@@ -41,9 +51,10 @@ class NavBar extends Component {
             <Box>
               <HeroText href="/">Digicah</HeroText>
             </Box>
-            <Box mt='10px'>
+            <ActionWrapper mt='10px'>
               {buttons}
-            </Box>
+              {timer}
+            </ActionWrapper>
           </Flex>
         </Toolbar>
       </AppBar>
@@ -53,7 +64,8 @@ class NavBar extends Component {
 
 const mapStateToProps = state => ({
   player: state.player,
-  display: state.display
+  display: state.display,
+  playing: state.game.playing
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({
@@ -65,4 +77,4 @@ const mapDispatchToProps = dispatch => bindActionCreators({
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withStyles(styles)(NavBar));
+)(NavBar);

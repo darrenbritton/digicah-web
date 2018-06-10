@@ -49,6 +49,11 @@ const CardBody = styled.div`
       visibility: visible;
     }
   `}
+  
+    ${props => props.played && css`
+    background-color: #b9b9b9;
+    cursor: not-allowed;
+  `}
 `;
 
 
@@ -56,23 +61,26 @@ class Card extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected: false
+      selected: false,
+      played: false
     };
   }
   toggle = () => {
     this.setState({selected: !this.state.selected});
   }
   select = () => {
-    this.props.select(this.props.text, !this.state.selected);
-    this.toggle();
+    if (!this.state.played) {
+      this.toggle();
+    }
   }
   submit = () => {
     this.props.submit(this.props.index);
+    this.setState({played: true});
   }
   render() {
     return (
-      <CardBody selected={this.state.selected} {...this.props} onClick={() => this.props.select ? this.select() : undefined}>
-        <span>{this.props.text}</span>
+      <CardBody played={this.state.played} selected={this.state.selected} {...this.props} onClick={() => this.select()}>
+        <span dangerouslySetInnerHTML={{ __html: (Array.isArray(this.props.text) ? this.props.text.join('</br></br>') : this.props.text) }} />
         <Button variant="raised" onClick={() => this.toggle()} color='secondary'>
           Cancel
         </Button>

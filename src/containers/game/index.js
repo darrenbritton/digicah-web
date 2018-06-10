@@ -23,35 +23,36 @@ const DrawerButton = styled(Button)`
 class Home extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      selectedTexts: [],
-    };
   }
-  logger = (text, submit) => {
-    if(submit) {
-      this.setState({selectedTexts: [...this.state.selectedTexts, text]})
-    } else {
-      this.setState({selectedTexts: this.state.selectedTexts.filter(value => value !== text)})
-    }
-  };
 
   fillInText = () => {
     let index = 0;
     let populatedText = this.props.game.playing.currentRound.blackCard.text;
-    while(populatedText.indexOf('___') > 0 && this.state.selectedTexts[index]) {
-      populatedText = populatedText.replace('___', this.state.selectedTexts[index]);
+    while(populatedText.indexOf('___') > 0 && this.props.player.submittedTexts[index]) {
+      populatedText = populatedText.replace('___', this.props.player.submittedTexts[index]);
+      index++;
     }
     return populatedText;
+  };
+
+  submit = (index) => {
+    this.props.submit(index);
+  };
+
+  judge = (id) => {
+    this.props.judge({id});
   };
 
   render() {
     const { playing } = this.props.game;
     const { player } =  this.props;
     let roundPlayer =  { hand: []};
-    if (this.props.game.playing.currentRound.players) {
+    if (this.props.game.playing.currentRound && this.props.game.playing.currentRound.players) {
       const roundPlayerData = this.props.game.playing.currentRound.players.find(roundPlayer => roundPlayer.id === player.session.id);
       if (roundPlayerData) {
         roundPlayer = roundPlayerData;
+      } else if (!roundPlayerData && this.props.game.playing.currentRound.cardCzar.id === player.session.id) {
+        roundPlayer = this.props.game.playing.currentRound.cardCzar;
       }
     }
     return (
@@ -66,7 +67,7 @@ class Home extends Component {
                 {player.inGame && playing.players && playing.players.map((player, index) => (
                   <ListItem key={player.id} >
                     <Avatar alt={player.nickname} src={player.profilePicture} />
-                    <ListItemText primary={player.isCzar? 'Card Czar' : player.onBreak ? 'On Break' : 'Playing'} />
+                    <ListItemText primary={player.isCzar? 'Card Czar' : player.onBreak ? 'On Break' : 'Playing'} secondary={`score: ${player.score}`} />
                   </ListItem>
                 ))}
               </List>
@@ -74,7 +75,7 @@ class Home extends Component {
           </Box>
           </div>
         </Drawer>
-        <Drawer anchor="bottom" open={this.props.display.breakDrawer} onClose={() => this.props.returnFromBreak()}>
+        <Drawer anchor="bottom" open={this.props.display.breakDrawer || this.props.player.onBreak} onClose={() => this.props.returnFromBreak()}>
           <div
             tabIndex={0}
           >
@@ -85,16 +86,32 @@ class Home extends Component {
         </Drawer>
         <Flex justifyContent='center'>
           <Box m='auto'>
-            <Card text={ Object.keys(this.props.game.playing.currentRound).length === 0 ? '' : this.state.selectedTexts.length === 0 ? this.props.game.playing.currentRound.blackCard.text : this.fillInText()} black />
+            <Card text={ Object.keys(this.props.game.playing.currentRound).length === 0 ? '' : this.fillInText()} black />
           </Box>
         </Flex>
         <Flex justifyContent='center' flexWrap='wrap'>
-          {
-            roundPlayer.hand.map((card, index) => (
-              <Box>
-                <Card text={card.text} index={index} submit={this.logger} select={this.logger} />
+          { !roundPlayer.isCzar && player.hand &&
+            player.hand.map((card, index) => (
+              <Box key={card.text}>
+                <Card text={card.text} index={index} submit={(index) => this.submit({index})} />
               </Box>
             ))
+          }
+          { roundPlayer.isCzar && !this.props.game.playing.currentRound.submissions &&
+            <Box>
+              <h1>{'Waiting for submissions...'}</h1>
+            </Box>
+          }
+          { this.props.game.playing.currentRound.submissions &&
+            Object.keys(this.props.game.playing.currentRound.submissions).map((key) => {
+              const submission = this.props.game.playing.currentRound.submissions[key];
+              return (
+                <Box key={key}>
+                  <Card text={submission} index={key} submit={(key) => this.judge(key)}
+                        select={this.logger}/>
+                </Box>
+              );
+            })
           }
         </Flex>
       </div>
@@ -112,6 +129,8 @@ const mapDispatchToProps = dispatch => bindActionCreators({
   changePage: () => push('/about-us'),
   togglePlayerDrawer: display.togglePlayerDrawer,
   returnFromBreak: player.returnFromBreak,
+  submit: player.submit,
+  judge: player.judge
 }, dispatch);
 
 export default connect(

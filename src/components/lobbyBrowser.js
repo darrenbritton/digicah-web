@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Flex, Box } from 'grid-styled';
 import styled from 'styled-components';
-import SwipeableViews from 'react-swipeable-views';
+import theme from '../utils/theme';
 
 import { game, player } from '../actions';
 
@@ -27,6 +27,8 @@ import Button from '@material-ui/core/Button';
 import {push} from "react-router-redux";
 
 const FormTab = styled(Box)`
+  min-width: 52vw;
+  margin: 0 20px;
   
   & > div > div, button {
     width: 100%;
@@ -35,7 +37,18 @@ const FormTab = styled(Box)`
   button {
     margin-bottom: 3vh;
   }
+`;
+
+const LobbyTab = styled(Box)`
+  min-width: 52vw;
+  max-width: 90vw;
+  overflow-x: scroll;
   
+  @media (min-width: ${theme.scrollWidth}px) {
+    ::-webkit-scrollbar {
+      width: 0px;
+    }
+  }
 `;
 
 const ITEM_HEIGHT = 48;
@@ -62,10 +75,6 @@ class LobbyBrowser extends Component {
   }
 
   handleChange = (event, tabValue) => {
-    this.setState({ tabValue });
-  };
-
-  handleChangeIndex = tabValue => {
     this.setState({ tabValue });
   };
 
@@ -107,121 +116,120 @@ class LobbyBrowser extends Component {
                 <Tab label="Create" />
               </Tabs>
             </AppBar>
-            <SwipeableViews
-              index={this.state.tabValue}
-              onChangeIndex={this.handleChangeIndex}
-            >
-                <Box mt="1vh">
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Creator</TableCell>
-                        <TableCell>Cardpacks</TableCell>
-                        <TableCell>Password Protected</TableCell>
-                        <TableCell>Players</TableCell>
-                        <TableCell>Game In Progress</TableCell>
-                        <TableCell />
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {this.props.lobbies.map(n => {
-                        return (
-                          <TableRow key={n.id}>
-                            <TableCell component="th" scope="row">
-                              {n.name}
-                            </TableCell>
-                            <TableCell>{n.creator}</TableCell>
-                            <TableCell>{n.cardpacks.join(', ')}</TableCell>
-                            <TableCell>{n.hasPassword ? '✔️' : '❌'}</TableCell>
-                            <TableCell>{`${n.maxPlayers}/${n.players.length}`}</TableCell>
-                            <TableCell>{n.waitForPlayers ? '✔️' : '❌'}</TableCell>
-                            <TableCell>
-                              <Button variant="raised" color="primary" onClick={() => this.join(n.id)}>
-                                Join
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </Box>
-              <FormTab m='1vw'>
-                <Box mt='3vh'>
-                  <TextField
-                    id="name"
-                    label="Name"
-                    value={this.state.name}
-                    onChange={this.handleNameChange}
-                    margin="normal"
-                  />
-                </Box>
-                <Box mt='3vh'>
-                  <FormControl>
-                    <InputLabel htmlFor="select-multiple-chip">Cardpacks</InputLabel>
-                    <Select
-                      multiple
-                      value={this.state.cardpacks}
-                      onChange={this.handleSelectChange}
-                      input={<Input id="select-multiple-chip" />}
-                      renderValue={selected => (
-                        <div>
-                          {selected.map(value => <Chip key={value} label={value} />)}
-                        </div>
-                      )}
-                      MenuProps={MenuProps}
-                    >
-                      {this.props.cardpacks.map(cardpack => (
-                        <MenuItem
-                          key={cardpack}
-                          value={cardpack}
-                        >
-                          {cardpack}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Box>
-                <Box mt='3vh'>
-                  <TextField
-                    id="password"
-                    label="Password"
-                    value={this.state.password}
-                    onChange={this.handlePasswordChange}
-                    placeholder='Leave empty for no password'
-                    type="password"
-                    autoComplete="current-password"
-                    margin="normal"
-                  />
-                </Box>
-                <Box mt='3vh'>
-                  <TextField
-                    error={this.state.maxPlayers > 15 || this.state.maxPlayers < 3}
-                    id="maxPlayers"
-                    label="Max Players"
-                    type="number"
-                    value={this.state.maxPlayers}
-                    onChange={this.handleMaxPlayersChange}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    InputProps={{
-                      inputProps: {
-                        min: 3,
-                        max: 15
-                      }
-                    }}
-                    margin="normal"
-                  />
-                </Box>
-                <Box mt='3vh'>
-                  <Button variant="raised" color="primary" onClick={this.createGame}>
-                    Create
-                  </Button>
-                </Box>
-              </FormTab>
-            </SwipeableViews>
+            { this.state.tabValue === 0 &&
+                <LobbyTab mt="1vh">
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Creator</TableCell>
+                      <TableCell>Cardpacks</TableCell>
+                      <TableCell>Password Protected</TableCell>
+                      <TableCell>Players</TableCell>
+                      <TableCell>Game In Progress</TableCell>
+                      <TableCell/>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.props.lobbies.map(n => {
+                      return (
+                        <TableRow key={n.id}>
+                          <TableCell component="th" scope="row">
+                            {n.name}
+                          </TableCell>
+                          <TableCell>{n.creator}</TableCell>
+                          <TableCell>{n.cardpacks.join(', ')}</TableCell>
+                          <TableCell>{n.hasPassword ? '✔️' : '❌'}</TableCell>
+                          <TableCell>{`${n.maxPlayers}/${n.players.length}`}</TableCell>
+                          <TableCell>{n.waitForPlayers ? '✔️' : '❌'}</TableCell>
+                          <TableCell>
+                            <Button variant="raised" color="primary" onClick={() => this.join(n.id)}>
+                              Join
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </LobbyTab>
+            }
+            {this.state.tabValue === 1 &&
+            <FormTab m='1vw'>
+              <Box mt='3vh'>
+                <TextField
+                  id="name"
+                  label="Name"
+                  value={this.state.name}
+                  onChange={this.handleNameChange}
+                  margin="normal"
+                />
+              </Box>
+              <Box mt='3vh'>
+                <FormControl>
+                  <InputLabel htmlFor="select-multiple-chip">Cardpacks</InputLabel>
+                  <Select
+                    multiple
+                    value={this.state.cardpacks}
+                    onChange={this.handleSelectChange}
+                    input={<Input id="select-multiple-chip"/>}
+                    renderValue={selected => (
+                      <div>
+                        {selected.map(value => <Chip key={value} label={value}/>)}
+                      </div>
+                    )}
+                    MenuProps={MenuProps}
+                  >
+                    {this.props.cardpacks.map(cardpack => (
+                      <MenuItem
+                        key={cardpack}
+                        value={cardpack}
+                      >
+                        {cardpack}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+              <Box mt='3vh'>
+                <TextField
+                  id="password"
+                  label="Password"
+                  value={this.state.password}
+                  onChange={this.handlePasswordChange}
+                  placeholder='Leave empty for no password'
+                  type="password"
+                  autoComplete="current-password"
+                  margin="normal"
+                />
+              </Box>
+              <Box mt='3vh'>
+                <TextField
+                  error={this.state.maxPlayers > 15 || this.state.maxPlayers < 3}
+                  id="maxPlayers"
+                  label="Max Players"
+                  type="number"
+                  value={this.state.maxPlayers}
+                  onChange={this.handleMaxPlayersChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  InputProps={{
+                    inputProps: {
+                      min: 3,
+                      max: 15
+                    }
+                  }}
+                  margin="normal"
+                />
+              </Box>
+              <Box mt='3vh'>
+                <Button variant="raised" color="primary" onClick={this.createGame}>
+                  Create
+                </Button>
+              </Box>
+            </FormTab>
+            }
           </Paper>
         </Box>
       </Flex>

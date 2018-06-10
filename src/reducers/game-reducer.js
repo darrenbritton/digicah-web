@@ -1,4 +1,4 @@
-import { SAVE_LOBBIES, SAVE_CARDPACKS, JOIN_GAME, NEW_ROUND, GAME_UPDATE } from '../actions';
+import { SAVE_LOBBIES, SAVE_CARDPACKS, JOIN_GAME, NEW_ROUND, GAME_UPDATE, CZAR_JUDGE, GAME_JUDGING } from '../actions';
 
 export default function (state = { lobbies: [], cardpacks: [], playing: { currentRound: {}}}, action) {
   switch (action.type) {
@@ -24,6 +24,25 @@ export default function (state = { lobbies: [], cardpacks: [], playing: { curren
         playing: {
           ...state.playing,
           currentRound: action.payload
+        },
+      };
+    case CZAR_JUDGE:
+      return {
+        ...state,
+        playing: {
+          ...state.playing,
+          currentRound: {
+            ...state.playing.currentRound,
+            submissions: action.payload
+          }
+        },
+      };
+    case GAME_JUDGING:
+      return {
+        ...state,
+        playing: {
+          ...state.playing,
+          judging: true
         },
       };
     case GAME_UPDATE:

@@ -58,8 +58,8 @@ class App extends Component {
           <Route exact path="/play/game/:id" component={Game} />
           <Route exact path="/about-us" component={About} />
           <Route exact path="/logged-out" component={LoggedOut} />
-          <Route path="/login" component={() => { window.location = '//localhost:8080/auth/google'; }} />
-          <Route path="/logout" component={() => { window.location = '//localhost:8080/logout'; }} />
+          <Route path="/login" component={() => { window.location = `//${window.location.hostname}:8080/auth/google`; }} />
+          <Route path="/logout" component={() => { window.location = `//${window.location.hostname}:8080/logout`; }} />
         </main>
         <SnackBar/>
       </div>

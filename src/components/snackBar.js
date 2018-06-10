@@ -89,7 +89,7 @@ class SnackBar extends React.Component {
           message={<span id="message-id">{text}</span>}
           action={[
             <Button key="undo" color="secondary" size="small" onClick={() => this.handleAction(action)}>
-              {actionText}
+              {actionText || ''}
             </Button>,
             <IconButton
               key="close"
